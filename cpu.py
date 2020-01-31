@@ -119,7 +119,31 @@ class CPU:
         def CMP(operand_a, operand_b):
             self.alu('CMP', operand_a, operand_b)
             self.pc += 3
-        
+
+        def AND(operand_a, operand_b):
+            self.alu('AND', operand_a, operand_b)
+            self.pc += 3
+
+        def OR(operand_a, operand_b):
+            self.alu('OR', operand_a, operand_b)
+            self.pc += 3
+    
+        def XOR(operand_a, operand_b):
+            self.alu('XOR', operand_a, operand_b)
+            self.pc += 3
+
+        def NOT(operand_a, operand_b):
+            self.alu('NOT', operand_a, operand_b)
+            self.pc += 3
+    
+        def SHL(operand_a, operand_b):
+            self.alu('SHL', operand_a, operand_b)
+            self.pc += 3
+
+        def SHR(operand_a, operand_b):
+            self.alu('SHR', operand_a, operand_b)
+            self.pc += 3
+
         self.op_codes = {
             0b10000010: LDI,
             0b01000111: PRN,
@@ -138,6 +162,12 @@ class CPU:
             0b10100011: DIV,
             0b10100100: MOD,
             0b10100111: CMP,
+            0b10101000: AND,
+            0b10101010: OR,
+            0b10101011: XOR,
+            0b01101001: NOT,
+            0b10101100: SHL,
+            0b10101101: SHR,
         }
 
     def load(self):
@@ -168,6 +198,7 @@ class CPU:
             print(f'{sys.argv[0]}: {sys.argv[1]} not found.')
             sys.exit(2)
 
+    # Arithmetic Logic Unit
     def alu(self, op, reg_a, reg_b):
         """ALU operations."""
 
@@ -186,15 +217,6 @@ class CPU:
             # Divide the value in the first register by the value in the second,
             # storing the result in registerA
             self.reg[reg_a] /= self.reg[reg_b]
-        elif op == 'MOD':
-            # Divide the value in the first register by the value in the second,
-            # storing the remainder of the result in registerA
-            # If the value in the second register is 0, the system should print
-            # an error message and halt.
-            if reg_b is not 0:
-                self.reg[reg_a] %= self.reg[reg_b]
-            else:
-                sys.exit('Second value can not be zero.')
         elif op == 'CMP':
             if self.reg[reg_a] < self.reg[reg_b]:
                 # Set to 1 if registerA is less than registerB, zero otherwise.
@@ -205,6 +227,40 @@ class CPU:
             elif self.reg[reg_a] == self.reg[reg_b]:
                 # Set to 1 if registerA is equal to registerB, zero otherwise
                 self.fl = 0b00000001
+        elif op == 'AND':
+            # Bitwise-AND the values in registerA and registerB, then store the
+            # result in registerA.
+            self.reg[reg_a] = self.reg[reg_a] & self.reg[reg_b]
+        elif op == 'OR':
+            # Perform a bitwise-OR between the values in registerA and registerB,
+            # storing the result in registerA.
+            self.reg[reg_a] = self.reg[reg_a] | self.reg[reg_b]
+        elif op == 'XOR':
+            # Perform a bitwise-XOR between the values in registerA and registerB,
+            # storing the result in registerA.
+            a = self.reg[reg_a]
+            b = self.reg[reg_b]
+            self.reg[reg_a] = (a | b) & ~(a & b)
+        elif op == 'NOT':
+            # Perform a bitwise-NOT on the value in a register.
+            self.reg[reg_a] = ~self.reg[reg_a]
+        elif op == 'SHL':
+            # Shift the value in registerA left by the number of bits specified in
+            # registerB, filling the low bits with 0.
+            self.reg[reg_a] << self.reg[reg_b]
+        elif op == 'SHR':
+            # Shift the value in registerA right by the number of bits specified in
+            # registerB, filling the high bits with 0.
+            self.reg[reg_a] >> self.reg[reg_b]
+        elif op == 'MOD':
+            # Divide the value in the first register by the value in the second,
+            # storing the remainder of the result in registerA
+            # If the value in the second register is 0, the system should print
+            # an error message and halt.
+            if reg_b is not 0:
+                self.reg[reg_a] %= self.reg[reg_b]
+            else:
+                sys.exit('Second value can not be zero.')
         else:
             raise Exception("Unsupported ALU operation")
 
