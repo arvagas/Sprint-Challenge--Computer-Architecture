@@ -11,6 +11,7 @@ class CPU:
         self.reg = [0] * 8 # Register
         self.pc = 0 # Program counter; points to the current instruction
         self.sp = 7 # Stack pointer; lives in register spot 7
+        self.fl = 0b00000000 # Holds current flag status; Changes based on CMP
         self.running = True # Makes sure program is running
 
         def LDI(operand_a, operand_b):
@@ -93,6 +94,10 @@ class CPU:
         def MOD(operand_a, operand_b):
             self.alu('MOD', operand_a, operand_b)
             self.pc += 3
+
+        def CMP(operand_a, operand_b):
+            self.alu('CMP', operand_a, operand_b)
+            self.pc += 3
         
         self.op_codes = {
             0b10000010: LDI,
@@ -107,7 +112,8 @@ class CPU:
             0b10100001: SUB,
             0b10100010: MUL,
             0b10100011: DIV,
-            0b10100100: MOD
+            0b10100100: MOD,
+            0b10100111: CMP,
         }
 
     def load(self):
@@ -165,6 +171,16 @@ class CPU:
                 self.reg[reg_a] %= self.reg[reg_b]
             else:
                 sys.exit('Second value can not be zero.')
+        elif op == 'CMP':
+            if self.reg[reg_a] < self.reg[reg_b]:
+                # Set to 1 if registerA is less than registerB, zero otherwise.
+                self.fl = 0b00000100
+            elif self.reg[reg_a] > self.reg[reg_b]:
+                # Set to 1 if registerA is greater than registerB, zero otherwise
+                self.fl = 0b00000010
+            elif self.reg[reg_a] == self.reg[reg_b]:
+                # Set to 1 if registerA is equal to registerB, zero otherwise
+                self.fl = 0b00000001
         else:
             raise Exception("Unsupported ALU operation")
 
