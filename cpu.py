@@ -11,7 +11,9 @@ class CPU:
         self.reg = [0] * 8 # Register
         self.pc = 0 # Program counter; points to the current instruction
         self.sp = 7 # Stack pointer; lives in register spot 7
-        self.fl = 0b00000000 # Holds current flag status; Changes based on CMP
+        self.E_fl = 0 # Equal flag status; changes based on CMP
+        self.L_fl = 0 # Less-than flag status; changes based on CMP
+        self.G_fl = 0 # Greater-than flag status; changes based on CMP
         self.running = True # Makes sure program is running
 
         def LDI(operand_a, operand_b):
@@ -83,7 +85,7 @@ class CPU:
         def JEQ(operand_a, operand_b):
             # If equal flag is set (true), jump to the address stored in the
             # given register.
-            if self.fl == 0b00000001:
+            if self.E_fl == 1:
                 JMP(operand_a, operand_b)
             else:
                 self.pc += 2
@@ -91,7 +93,7 @@ class CPU:
         def JNE(operand_a, operand_b):
             # If E flag is clear (false, 0), jump to the address stored in
             # the given register.
-            if self.fl != 0b00000001:
+            if self.E_fl != 1:
                 JMP(operand_a, operand_b)
             else:
                 self.pc += 2
@@ -220,13 +222,19 @@ class CPU:
         elif op == 'CMP':
             if self.reg[reg_a] < self.reg[reg_b]:
                 # Set to 1 if registerA is less than registerB, zero otherwise.
-                self.fl = 0b00000100
+                self.E_fl = 0
+                self.L_fl = 1
+                self.G_fl = 0
             elif self.reg[reg_a] > self.reg[reg_b]:
                 # Set to 1 if registerA is greater than registerB, zero otherwise
-                self.fl = 0b00000010
+                self.E_fl = 0
+                self.L_fl = 0
+                self.G_fl = 1
             elif self.reg[reg_a] == self.reg[reg_b]:
                 # Set to 1 if registerA is equal to registerB, zero otherwise
-                self.fl = 0b00000001
+                self.E_fl = 1
+                self.L_fl = 0
+                self.G_fl = 0
         elif op == 'AND':
             # Bitwise-AND the values in registerA and registerB, then store the
             # result in registerA.
