@@ -25,7 +25,7 @@ class CPU:
             print(self.reg[operand_a])
             self.pc += 2
         
-        def HLT(operand_a, operand_b):
+        def HLT(operand_a=None, operand_b=None):
             # Halt the CPU (and exit the emulator)
             self.running = False
 
@@ -112,10 +112,6 @@ class CPU:
             self.alu('DIV', operand_a, operand_b)
             self.pc += 3
 
-        def MOD(operand_a, operand_b):
-            self.alu('MOD', operand_a, operand_b)
-            self.pc += 3
-
         def CMP(operand_a, operand_b):
             self.alu('CMP', operand_a, operand_b)
             self.pc += 3
@@ -142,6 +138,10 @@ class CPU:
 
         def SHR(operand_a, operand_b):
             self.alu('SHR', operand_a, operand_b)
+            self.pc += 3
+
+        def MOD(operand_a, operand_b):
+            self.alu('MOD', operand_a, operand_b)
             self.pc += 3
 
         self.op_codes = {
@@ -257,10 +257,10 @@ class CPU:
             # storing the remainder of the result in registerA
             # If the value in the second register is 0, the system should print
             # an error message and halt.
-            if reg_b is not 0:
+            if self.reg[reg_b] is not 0:
                 self.reg[reg_a] %= self.reg[reg_b]
             else:
-                sys.exit('Second value can not be zero.')
+                sys.exit('Value in second register can not be zero.')
         else:
             raise Exception("Unsupported ALU operation")
 
