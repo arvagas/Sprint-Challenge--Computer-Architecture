@@ -80,6 +80,22 @@ class CPU:
             # Set the PC to the address stored in the given register.
             self.pc = self.reg[operand_a]
         
+        def JEQ(operand_a, operand_b):
+            # If equal flag is set (true), jump to the address stored in the
+            # given register.
+            if self.fl == 0b00000001:
+                JMP(operand_a, operand_b)
+            else:
+                self.pc += 2
+        
+        def JNE(operand_a, operand_b):
+            # If E flag is clear (false, 0), jump to the address stored in
+            # the given register.
+            if self.fl != 0b00000001:
+                JMP(operand_a, operand_b)
+            else:
+                self.pc += 2
+            
         def ADD(operand_a, operand_b):
             self.alu('ADD', operand_a, operand_b)
             self.pc += 3
@@ -113,6 +129,8 @@ class CPU:
             0b01010000: CALL,
             0b00010001: RET,
             0b01010100: JMP,
+            0b01010101: JEQ,
+            0b01010110: JNE,
             # ALU
             0b10100000: ADD,
             0b10100001: SUB,
@@ -225,7 +243,6 @@ class CPU:
             IR = self.ram_read(self.pc)
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
-
             # Find opcode name of IR
             opcode = self.op_codes[IR]
             
