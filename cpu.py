@@ -75,6 +75,11 @@ class CPU:
             self.pc = self.ram[self.reg[self.sp]]
             self.reg[self.sp] += 1
         
+        def JMP(operand_a, operand_b):
+            # Jump to the address stored in the given register.
+            # Set the PC to the address stored in the given register.
+            self.pc = self.reg[operand_a]
+        
         def ADD(operand_a, operand_b):
             self.alu('ADD', operand_a, operand_b)
             self.pc += 3
@@ -107,6 +112,7 @@ class CPU:
             0b01000110: POP,
             0b01010000: CALL,
             0b00010001: RET,
+            0b01010100: JMP,
             # ALU
             0b10100000: ADD,
             0b10100001: SUB,
